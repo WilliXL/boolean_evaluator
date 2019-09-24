@@ -1,4 +1,4 @@
-# Quick and Simple Boolean Evaluator
+# Quick and Simple Boolean Evaluator for 15-110 Grading
 
 Todo @me: add documentation. Currently there is a brief documentation in the comments at the top of booleanEvaluator.py
 
