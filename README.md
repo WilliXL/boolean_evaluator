@@ -4,7 +4,10 @@ Todo @me: add documentation. Currently there is a brief documentation in the com
 Make sure to follow the syntax invariants, there WILL be errors and the error messages will not be very helpful
 
 The main thing is just how to run.
-To run do: `python3 booleanEvaluator.py -e "<your expression>"`
+To run do either:
+`python3 booleanEvaluator.py -e "<your expression>"`
+`python3 booleanEvaluator.py --expression "<your expression>"`
+Make sure the entire expression is placed within quotation marks.
 
 ## IMPORTANT:
 The NOT operation doesn't work yet. It's a weird syntactical form. Sorry :(
