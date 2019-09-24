@@ -17,6 +17,9 @@
 # but X OR (X AND Y) will NOT work
 # so please write something like the above in this form: (X AND Y) OR X
 
+# Multi-nested expressions also won't work ie. (X OR (X OR Y)) AND Z
+# There should be a simple WAR to this though, but I can't figure it out right now
+
 # Also also two variable inputs have to be X and Y. X and Z, or Y and Z combinations will NOT work
 
 import re
