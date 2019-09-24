@@ -45,7 +45,7 @@ class InputTypes:
     ]
 
 class TokenTypes:
-    INPUT, AND, OR, XOR, NOT, LP, RP = range(7)
+    CONST, INPUT, AND, OR, XOR, NOT, LP, RP = range(8)
 
 class ASTNode:
     tokenType = None
@@ -91,9 +91,11 @@ class Tokenizer:
             return False
 
     def tokenize(self):
+        self.expression = self.expression.replace("NOT", "1 XOR")
         regEx = re.compile(r'(\bAND\b|\bOR\b|\bXOR\b|\bNOT\b|\(|\))')
         self.tokens = regEx.split(self.expression)
         self.tokens = [t.strip() for t in self.tokens if t.strip() != '']
+        print(self.tokens)
 
         self.tokenTypes = []
         for t in self.tokens:
@@ -111,6 +113,8 @@ class Tokenizer:
                 self.tokenTypes.append(TokenTypes.RP)
             elif t == 'X' or t == 'Y' or t == 'Z':
                 self.tokenTypes.append(TokenTypes.INPUT)
+            elif t == '1': # only used for NOT case
+                self.tokenTypes.append(TokenTypes.CONST)
             else: # if used properly, should never get to this case...
                 self.tokenTypes.append(None) # SOMETHING'S WRONGGGG
 
@@ -127,48 +131,37 @@ class Parser:
         return self.root
 
     def parseExpression(self):
-        notTerm1 = self.parseNotTerm()
+        leftTerm = self.parseXorTerm()
         while self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenTypes.XOR:
             self.tokenizer.next()
-            notTerm2 = self.parseNotTerm()
-            notTerm = ASTNode(TokenTypes.XOR)
-            notTerm.left = notTerm1
-            notTerm.right = notTerm2
-            notTerm1 = notTerm
-        return notTerm1
-
-    def parseNotTerm(self):
-        xorTerm1 = self.parseXorTerm()
-        while self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenTypes.NOT:
-            self.tokenizer.next()
-            xorTerm2 = None
-            xorTerm = ASTNode(TokenTypes.NOT)
-            xorTerm.left = xorTerm1
-            xorTerm.right = xorTerm2
-            xorTerm1 = xorTerm
-        return xorTerm1
+            rightTerm = self.parseNotTerm()
+            root = ASTNode(TokenTypes.XOR)
+            root.left = leftTerm
+            root.right = rightTerm
+            leftTerm = root
+        return leftTerm
 
     def parseXorTerm(self):
-        andTerm1 = self.parseAndTerm()
+        leftTerm = self.parseAndTerm()
         while self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenTypes.OR:
             self.tokenizer.next()
-            andTerm2 = self.parseAndTerm()
-            andTerm = ASTNode(TokenTypes.OR)
-            andTerm.left = andTerm1
-            andTerm.right = andTerm2
-            andTerm1 = andTerm
-        return andTerm1
+            rightTerm = self.parseAndTerm()
+            root = ASTNode(TokenTypes.OR)
+            root.left = leftTerm
+            root.right = rightTerm
+            leftTerm = root
+        return leftTerm
 
     def parseAndTerm(self):
-        nestedTerm1 = self.parseNested()
+        leftTerm = self.parseNested()
         while self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenTypes.AND:
             self.tokenizer.next()
-            nestedTerm2 = self.parseNested()
-            nestedTerm = ASTNode(TokenTypes.AND)
-            nestedTerm.left = nestedTerm1
-            nestedTerm.right = nestedTerm2
-            nestedTerm1 = nestedTerm
-        return nestedTerm1
+            rightTerm = self.parseNested()
+            root = ASTNode(TokenTypes.AND)
+            root.left = leftTerm
+            root.right = rightTerm
+            leftTerm = root
+        return leftTerm
 
     def parseNested(self):
         if self.tokenizer.hasNext() and self.tokenizer.nextTokenType() == TokenTypes.LP:
@@ -199,6 +192,10 @@ class Parser:
             if tokenType == TokenTypes.INPUT:
                 n = ASTNode(tokenType)
                 n.val = self.tokenizer.next()
+                return n
+            elif tokenType == TokenTypes.CONST: # only used in the NOT case
+                n = ASTNode(tokenType)
+                n.val = int(self.tokenizer.next())
                 return n
             else:
                 raise Exception(self.tokenizer.next())
@@ -242,8 +239,11 @@ class Evaluator:
 
     def evaluateRecursive(self, ASTNode, inputDict):
         # base case, at a leaf
+        # import pdb; pdb.set_trace()
         if ASTNode.tokenType == TokenTypes.INPUT:
             return inputDict.get(ASTNode.val)
+        if ASTNode.tokenType == TokenTypes.CONST:
+            return ASTNode.val
 
         # recursive case, evaluate subtrees
         else:
