@@ -94,7 +94,6 @@ class Tokenizer:
         regEx = re.compile(r'(\bAND\b|\bOR\b|\bXOR\b|\bNOT\b|\(|\))')
         self.tokens = regEx.split(self.expression)
         self.tokens = [t.strip() for t in self.tokens if t.strip() != '']
-        print(self.tokens)
 
         self.tokenTypes = []
         for t in self.tokens:
