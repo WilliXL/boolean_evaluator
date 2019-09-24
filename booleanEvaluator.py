@@ -1,6 +1,8 @@
 # Made by William (wxl) for 15-110
 # Please DM me on Slack or email me if you find any bugs and I can fix them right away
 
+# modeled after this super helpful gist: https://gist.github.com/leehsueh/1290686/36b0baa053072c377ac7fc801d53200d17039674
+
 # Usage instructions:
 # just run python3 booleanEvaluator.py
 # the only argument right now is -e or --expression
