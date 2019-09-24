@@ -1,6 +1,7 @@
 # Quick and Simple Boolean Evaluator for 15-110 Grading
 
 Todo @me: add documentation. Currently there is a brief documentation in the comments at the top of booleanEvaluator.py
+Make sure to follow the syntax invariants, there WILL be errors and the error messages will not be very helpful
 
 The main thing is just how to run.
 To run do: `python3 booleanEvaluator.py -e "<your expression>"`
